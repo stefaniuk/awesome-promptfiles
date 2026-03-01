@@ -30,10 +30,8 @@ test: # Run all tests @Testing
 clone-rt: # Clone the repository template into .github/skills/repository-template @Operations
 	.github/skills/repository-template/scripts/git-clone-repository-template.sh
 
-patch-speckit: # Fetch upstream spec-kit and apply local extensions @Operations
-	./scripts/patch-speckit.sh
-
-specify: patch-speckit # Alias for patch-speckit (backwards compatibility) @Operations
+specify: # Fetch upstream spec-kit and apply local extensions @Operations
+	./scripts/specify.sh
 
 apply: # Copy prompt files assets to a destination repository; mandatory: dest=[path] ai=[copilot|claude]; optional: clean|revert=[true|false], all|python|typescript|react|rust|terraform|tauri|playwright|django|fastapi=[true] @Operations
 	$(if $(dest),,$(error dest is required. Usage: make apply dest=/path/to/destination ai=copilot|claude))
@@ -81,6 +79,5 @@ ${VERBOSE}.SILENT: \
 	lint-markdown-format \
 	lint-markdown-links \
 	lint-shell \
-	patch-speckit \
 	specify \
 	test \

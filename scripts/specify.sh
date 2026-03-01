@@ -6,7 +6,7 @@ set -euo pipefail
 # patched files in the effective locations.
 #
 # Usage:
-#   $ [options] ./scripts/patch-speckit.sh
+#   $ [options] ./scripts/specify.sh
 #
 # Options:
 #   dry_run=true            # Show what would change without modifying files, default is 'false'
@@ -29,6 +29,7 @@ EXTENSIONS_DIR="${REPO_ROOT}/.specify/extensions"
 MANIFEST_FILE="${EXTENSIONS_DIR}/manifest.yaml"
 
 # Target locations for patched files
+TARGET_COMMANDS="${REPO_ROOT}/.claude/commands"
 TARGET_AGENTS="${REPO_ROOT}/.github/agents"
 TARGET_PROMPTS="${REPO_ROOT}/.github/prompts"
 TARGET_TEMPLATES="${REPO_ROOT}/.specify/templates"
@@ -51,9 +52,10 @@ function main() {
   fetch-upstream-files "$TEMP_DIR"
 
   echo "==> Applying local extensions..."
-  patch-category "$TEMP_DIR" "agents" ".github/agents" "${TARGET_AGENTS}" "speckit.*.agent.md"
-  patch-category "$TEMP_DIR" "prompts" ".github/prompts" "${TARGET_PROMPTS}" "speckit.*.prompt.md"
-  patch-category "$TEMP_DIR" "templates" ".specify/templates" "${TARGET_TEMPLATES}" "*-template.md"
+  patch-category "$TEMP_DIR" "claude" "commands" ".claude/commands" "${TARGET_COMMANDS}" "speckit.*.md"
+  patch-category "$TEMP_DIR" "copilot" "agents" ".github/agents" "${TARGET_AGENTS}" "speckit.*.agent.md"
+  patch-category "$TEMP_DIR" "copilot" "prompts" ".github/prompts" "${TARGET_PROMPTS}" "speckit.*.prompt.md"
+  patch-category "$TEMP_DIR" "" "templates" ".specify/templates" "${TARGET_TEMPLATES}" "*-template.md"
 
   if is-arg-true "$dry_run"; then
     echo "==> Dry run complete. No files were modified."
@@ -89,43 +91,63 @@ function cleanup-temp-directory() {
 }
 
 # Fetch upstream spec-kit files using the specify CLI.
+# Runs specify init for both copilot and claude AI tools so that
+# all upstream artifacts are available for patching.
 # Arguments:
 #   $1=[path to temporary directory]
 function fetch-upstream-files() {
   local temp_dir="$1"
+  local ai_tools=("claude" "copilot")
 
-  (
-    cd "$temp_dir"
-    specify init \
-      --ai copilot \
-      --script sh \
-      --ignore-agent-tools \
-      --no-git \
-      --here \
-      --force \
-      > /dev/null 2>&1
-  )
+  for ai_tool in "${ai_tools[@]}"; do
+    (
+      cd "$temp_dir"
+      specify init \
+        --ai "${ai_tool}" \
+        --script sh \
+        --ignore-agent-tools \
+        --no-git \
+        --here \
+        --force \
+        > /dev/null 2>&1
+    )
+  done
 
   return 0
 }
 
-# Patch a category of files (agents, prompts, or templates).
+# Patch a category of files (commands, agents, prompts, or templates).
 # Arguments:
 #   $1=[path to temporary directory]
-#   $2=[category name: agents, prompts, or templates]
-#   $3=[source subdirectory within temp dir]
-#   $4=[target directory for patched files]
-#   $5=[glob pattern for files to process]
+#   $2=[AI tool name: claude, copilot, or empty for shared categories]
+#   $3=[category name: commands, agents, prompts, or templates]
+#   $4=[source subdirectory within temp dir]
+#   $5=[target directory for patched files]
+#   $6=[glob pattern for files to process]
 function patch-category() {
   local temp_dir="$1"
-  local category="$2"
-  local source_subdir="$3"
-  local target_dir="$4"
-  local glob_pattern="$5"
+  local ai_tool="$2"
+  local category="$3"
+  local source_subdir="$4"
+  local target_dir="$5"
+  local glob_pattern="$6"
 
   local source_dir="${temp_dir}/${source_subdir}"
-  local extensions_subdir="${EXTENSIONS_DIR}/${category}"
+  local extensions_subdir
+  if [[ -n "${ai_tool}" ]]; then
+    extensions_subdir="${EXTENSIONS_DIR}/${ai_tool}/${category}"
+  else
+    extensions_subdir="${EXTENSIONS_DIR}/${category}"
+  fi
   local dry_run=${dry_run:-false}
+
+  local display_name
+  if [[ -n "${ai_tool}" ]]; then
+    display_name="${ai_tool}/${category}"
+  else
+    display_name="${category}"
+  fi
+  echo "  [${display_name}]"
 
   if [[ ! -d "$source_dir" ]]; then
     echo "    Warning: Source directory not found: ${source_dir}"
@@ -150,7 +172,7 @@ function patch-category() {
     local target_file="${target_dir}/${filename}"
 
     if [[ -f "$ext_file" ]]; then
-      patch-file "$file" "$ext_file" "$target_file" "$filename"
+      patch-file "$file" "$ext_file" "$target_file" "$filename" "$ai_tool" "$category"
     else
       copy-file "$file" "$target_file" "$filename"
     fi
@@ -165,16 +187,20 @@ function patch-category() {
 #   $2=[path to extension file]
 #   $3=[path to target file]
 #   $4=[filename for display]
+#   $5=[AI tool name: claude, copilot, or empty for shared categories]
+#   $6=[category name: commands, agents, prompts, or templates]
 function patch-file() {
   local upstream_file="$1"
   local ext_file="$2"
   local target_file="$3"
   local filename="$4"
+  local ai_tool="$5"
+  local category="$6"
 
   local dry_run=${dry_run:-false}
   local injection_point
 
-  injection_point=$(get-injection-point "$filename")
+  injection_point=$(get-injection-point "$filename" "$ai_tool" "$category")
 
   echo "    Patching: ${filename} (injection: ${injection_point})"
 
@@ -196,8 +222,12 @@ function patch-file() {
   extension_body=$(extract-extension-body "$extension_content")
   extension_footer=$(extract-extension-footer "$extension_content")
 
+  # Strip any existing footer from upstream content to avoid duplicates
+  local upstream_body
+  upstream_body=$(extract-extension-body "$upstream_content")
+
   # Inject extension body at the configured location
-  patched_content=$(inject-extension "$upstream_content" "$extension_body" "$injection_point")
+  patched_content=$(inject-extension "$upstream_body" "$extension_body" "$injection_point")
 
   # Append footer at the very end if present
   if [[ -n "$extension_footer" ]]; then
@@ -235,10 +265,14 @@ function copy-file() {
 # Get the injection point for a file from the manifest.
 # Arguments:
 #   $1=[filename]
+#   $2=[AI tool name: claude, copilot, or empty for shared categories]
+#   $3=[category name: commands, agents, prompts, or templates]
 # Returns:
 #   Injection point string (via stdout)
 function get-injection-point() {
   local filename="$1"
+  local ai_tool="$2"
+  local category="$3"
   local default_injection="after-frontmatter"
 
   # Try to read from manifest if yq is available
@@ -250,14 +284,12 @@ function get-injection-point() {
       return 0
     fi
 
-    # Determine category from filename
+    # Query category default from manifest using AI tool prefix
     local category_default=""
-    if [[ "$filename" == *.agent.md ]]; then
-      category_default=$(yq -r '.defaults.agents // empty' "$MANIFEST_FILE" 2>/dev/null || echo "")
-    elif [[ "$filename" == *.prompt.md ]]; then
-      category_default=$(yq -r '.defaults.prompts // empty' "$MANIFEST_FILE" 2>/dev/null || echo "")
-    elif [[ "$filename" == *-template.md ]]; then
-      category_default=$(yq -r '.defaults.templates // empty' "$MANIFEST_FILE" 2>/dev/null || echo "")
+    if [[ -n "${ai_tool}" ]]; then
+      category_default=$(yq -r ".defaults.\"${ai_tool}\".\"${category}\" // empty" "$MANIFEST_FILE" 2>/dev/null || echo "")
+    else
+      category_default=$(yq -r ".defaults.\"${category}\" // empty" "$MANIFEST_FILE" 2>/dev/null || echo "")
     fi
 
     if [[ -n "$category_default" ]]; then
@@ -468,7 +500,7 @@ function inject-prepend() {
 
 # Extract the body of an extension file (everything before the footer).
 # The footer is identified by a line containing only "---" followed by
-# lines starting with "> **Version**:" and "> **Last Amended**:".
+# (optional blank lines and) lines starting with "> **Version**:".
 # Arguments:
 #   $1=[extension content]
 # Returns:
@@ -486,13 +518,16 @@ function extract-extension-body() {
 
   local total_lines=${#lines[@]}
 
-  # Scan backwards to find footer pattern: --- followed by Version and Last Amended
+  # Scan backwards to find footer pattern: --- followed by (optional blank lines and) Version
   local i=$((total_lines - 1))
   while [[ $i -ge 0 ]]; do
     local line="${lines[$i]}"
     if [[ "$line" == "---" ]]; then
-      # Check if following lines match footer pattern
+      # Skip blank lines after --- to find the first non-blank line
       local next_idx=$((i + 1))
+      while [[ $next_idx -lt $total_lines ]] && [[ -z "${lines[$next_idx]}" ]]; do
+        ((next_idx++))
+      done
       if [[ $next_idx -lt $total_lines ]]; then
         local next_line="${lines[$next_idx]}"
         if [[ "$next_line" =~ ^\>\ \*\*Version\*\*: ]]; then
@@ -528,7 +563,7 @@ function extract-extension-body() {
 
 # Extract the footer from an extension file.
 # The footer is identified by a line containing only "---" followed by
-# lines starting with "> **Version**:" and "> **Last Amended**:".
+# (optional blank lines and) lines starting with "> **Version**:".
 # Arguments:
 #   $1=[extension content]
 # Returns:
@@ -546,13 +581,16 @@ function extract-extension-footer() {
 
   local total_lines=${#lines[@]}
 
-  # Scan backwards to find footer pattern: --- followed by Version and Last Amended
+  # Scan backwards to find footer pattern: --- followed by (optional blank lines and) Version
   local i=$((total_lines - 1))
   while [[ $i -ge 0 ]]; do
     local line="${lines[$i]}"
     if [[ "$line" == "---" ]]; then
-      # Check if following lines match footer pattern
+      # Skip blank lines after --- to find the first non-blank line
       local next_idx=$((i + 1))
+      while [[ $next_idx -lt $total_lines ]] && [[ -z "${lines[$next_idx]}" ]]; do
+        ((next_idx++))
+      done
       if [[ $next_idx -lt $total_lines ]]; then
         local next_line="${lines[$next_idx]}"
         if [[ "$next_line" =~ ^\>\ \*\*Version\*\*: ]]; then

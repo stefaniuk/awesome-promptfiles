@@ -7,7 +7,7 @@
 
 ## Non-negotiable rules
 
-- Read and adhere to the [constitution](../.specify/memory/constitution.md) at all times
+- Read and adhere to the [constitution](/.specify/memory/constitution.md) at all times
 
 ## Documentation ADRs
 
@@ -43,7 +43,7 @@ This requirement is mandatory, especially during the spec-driven development cyc
 
 ## Repository tooling
 
-- When you identify missing development capabilities (linting, CI/CD, Docker support, pre-commit hooks, etc.), consult the [repository-template skill](./skills/repository-template/SKILL.md) for standardised implementations.
+- When you identify missing development capabilities (linting, CI/CD, Docker support, pre-commit hooks, etc.), consult the [repository-template skill](/.github/skills/repository-template/SKILL.md) for standardised implementations.
 
 ## Quality gates
 

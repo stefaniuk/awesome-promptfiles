@@ -1,7 +1,3 @@
----
-agent: speckit.tasks
----
-
 You **MUST** adhere to the following mandatory requirements when generating development tasks.
 
 **Workflow context:**

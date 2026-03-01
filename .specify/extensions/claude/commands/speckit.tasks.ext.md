@@ -6,7 +6,7 @@ You **MUST** adhere to the following mandatory requirements when generating deve
 - **Output:** `tasks.md` (actionable task list)
 - **Next phase:** Implementation (`/speckit.implement`)
 
-**Base requirements:** Follow all rules in [copilot-instructions.md](/.github/copilot-instructions.md), particularly:
+**Base requirements:** Follow all rules in [CLAUDE.md](/.claude/CLAUDE.md), particularly:
 
 - Repository Tooling
 - Test-Driven Development
@@ -55,7 +55,7 @@ make run
 Before marking `tasks.md` as complete, verify:
 
 - [ ] All phases and user stories from `plan.md` are covered
-- [ ] There is a task for each repository-template capability that was planned to be implemented using the skill at [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md)
+- [ ] There is a task for each repository-template capability that was planned to be implemented using the skill at [.claude/skills/repository-template/SKILL.md](/.claude/skills/repository-template/SKILL.md)
 - [ ] TDD sequencing is applied: Red (write failing test), Green (implement to pass), Refactor
 - [ ] Test tasks are listed before their corresponding implementation tasks
 - [ ] Each phase and user story ends with a task that runs `make lint` and `make test`
@@ -66,5 +66,5 @@ Before marking `tasks.md` as complete, verify:
 
 ---
 
-> **Version**: 1.5.3
-> **Last Amended**: 2026-02-27
+> **Version**: 1.6.0
+> **Last Amended**: 2026-03-01

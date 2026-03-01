@@ -11,19 +11,21 @@
 #
 # Usage:
 #   1. Create an extension file in the appropriate subdirectory:
-#      - .specify/extensions/agents/speckit.<name>.agent.ext.md
-#      - .specify/extensions/prompts/speckit.<name>.prompt.ext.md
+#      - .specify/extensions/claude/commands/speckit.<name>.ext.md
+#      - .specify/extensions/copilot/prompts/speckit.<name>.prompt.ext.md
 #      - .specify/extensions/templates/<name>-template.ext.md
 #
 #   2. Optionally configure the injection point below.
 #      If not specified, the category default is used.
 #
-#   3. Run: make patch-speckit
+#   3. Run: make specify
 
-# Default injection points per category
+# Default injection points per AI tool and category
 defaults:
-  agents: after-frontmatter
-  prompts: after-frontmatter
+  claude:
+    commands: after-frontmatter
+  copilot:
+    prompts: after-frontmatter
   templates: after-frontmatter
 
 # Per-file overrides (filename: injection-strategy)

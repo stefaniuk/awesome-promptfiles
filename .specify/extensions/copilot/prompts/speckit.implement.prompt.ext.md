@@ -32,5 +32,5 @@ Before marking implementation as complete, verify:
 
 ---
 
-> **Version**: 1.5.2
-> **Last Amended**: 2026-02-27
+> **Version**: 1.6.0
+> **Last Amended**: 2026-03-01

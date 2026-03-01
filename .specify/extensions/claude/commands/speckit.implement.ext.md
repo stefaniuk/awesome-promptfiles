@@ -1,7 +1,3 @@
----
-agent: speckit.implement
----
-
 You **MUST** adhere to the following mandatory requirements when implementing features.
 
 **Workflow context:**
@@ -10,7 +6,7 @@ You **MUST** adhere to the following mandatory requirements when implementing fe
 - **Output:** Working code with passing tests
 - **Verification:** Execute Show & Tell steps after each phase
 
-**Base requirements:** Follow all rules in [copilot-instructions.md](/.github/copilot-instructions.md), particularly:
+**Base requirements:** Follow all rules in [CLAUDE.md](/.claude/CLAUDE.md), particularly:
 
 - Repository Tooling
 - Test-Driven Development
@@ -28,10 +24,10 @@ You **MUST** adhere to the following mandatory requirements when implementing fe
 Before marking implementation as complete, verify:
 
 - [ ] All tasks in `tasks.md` are completed
-- [ ] Each repository-template capability that was planned to be implemented using the skill at [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md) is completed
+- [ ] Each repository-template capability that was planned to be implemented using the skill at [.claude/skills/repository-template/SKILL.md](/.claude/skills/repository-template/SKILL.md) is completed
 - [ ] TDD was followed: tests written before implementation
 - [ ] All `Show & Tell` steps executed successfully for each phase
-- [ ] Repository-template capabilities are present and up to date (see [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md))
+- [ ] Repository-template capabilities are present and up to date (see [.claude/skills/repository-template/SKILL.md](/.claude/skills/repository-template/SKILL.md))
 - [ ] `make lint` and `make test` complete with zero errors and zero warnings
 
 ---

@@ -2,6 +2,38 @@
 description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
 ---
 
+You **MUST** adhere to the following mandatory requirements when implementing features.
+
+**Workflow context:**
+
+- **Input:** `tasks.md` (actionable task list)
+- **Output:** Working code with passing tests
+- **Verification:** Execute Show & Tell steps after each phase
+
+**Base requirements:** Follow all rules in [copilot-instructions.md](/.github/copilot-instructions.md), particularly:
+
+- Repository Tooling
+- Test-Driven Development
+- Quality Gates
+
+## Implementation Process (Mandatory)
+
+1. Work through tasks in `tasks.md` sequentially
+2. Follow TDD: write failing test first, then implement, then refactor
+3. After completing each phase or user story, execute its `Show & Tell` steps to verify correctness
+4. Run `make lint` and `make test` after every source code change
+
+## Implementation Completion Checklist (Mandatory)
+
+Before marking implementation as complete, verify:
+
+- [ ] All tasks in `tasks.md` are completed
+- [ ] Each repository-template capability that was planned to be implemented using the skill at [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md) is completed
+- [ ] TDD was followed: tests written before implementation
+- [ ] All `Show & Tell` steps executed successfully for each phase
+- [ ] Repository-template capabilities are present and up to date (see [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md))
+- [ ] `make lint` and `make test` complete with zero errors and zero warnings
+
 ## User Input
 
 ```text
@@ -133,3 +165,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Report final status with summary of completed work
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
+
+---
+
+> **Version**: 1.6.0
+> **Last Amended**: 2026-03-01

@@ -1,7 +1,3 @@
----
-agent: speckit.plan
----
-
 You **MUST** adhere to the following mandatory requirements when creating a development plan.
 
 **Workflow context:**
@@ -10,7 +6,7 @@ You **MUST** adhere to the following mandatory requirements when creating a deve
 - **Output:** `plan.md` (implementation plan)
 - **Next phase:** Tasks generation (`/speckit.tasks`)
 
-**Base requirements:** Follow all rules in [copilot-instructions.md](/.github/copilot-instructions.md), particularly:
+**Base requirements:** Follow all rules in [CLAUDE.md](/.claude/CLAUDE.md), particularly:
 
 - Documentation ADRs
 - Toolchain Version
@@ -41,7 +37,7 @@ Before marking `plan.md` as complete, verify:
 - [ ] Plan addresses all requirements from `spec.md`
 - [ ] All architectural decisions have corresponding ADRs
 - [ ] Toolchain versions are specified, verified online during planning, and confirmed as the latest stable releases
-- [ ] Repository-template capabilities are planned using the skill at [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md), including at minimum:
+- [ ] Repository-template capabilities are planned using the skill at [.claude/skills/repository-template/SKILL.md](/.claude/skills/repository-template/SKILL.md), including at minimum:
   - [ ] Core Make System
   - [ ] Pre-commit Hooks
   - [ ] Secret Scanning
