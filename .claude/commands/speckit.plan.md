@@ -1,6 +1,6 @@
 ---
 description: Execute the implementation planning workflow using the plan template to generate design artifacts.
-handoffs: 
+handoffs:
   - label: Create Tasks
     agent: speckit.tasks
     prompt: Break the plan into tasks
@@ -18,7 +18,7 @@ You **MUST** adhere to the following mandatory requirements when creating a deve
 - **Output:** `plan.md` (implementation plan)
 - **Next phase:** Tasks generation (`/speckit.tasks`)
 
-**Base requirements:** Follow all rules in [copilot-instructions.md](/.github/copilot-instructions.md), particularly:
+**Base requirements:** Follow all rules in [CLAUDE.md](/.claude/CLAUDE.md), particularly:
 
 - Documentation ADRs
 - Toolchain Version
@@ -31,16 +31,16 @@ Each phase and user story in `plan.md` must include a `Show & Tell` subsection. 
 1. Expanded with specific commands in `tasks.md` (next phase)
 2. Executed by the user during implementation to verify completion
 
-### GitHub Copilot Execution Requirement (Mandatory)
+### AI Assistant Execution Requirement (Mandatory)
 
-Show & Tell steps must be written so GitHub Copilot can execute and validate them without guessing.
+Show & Tell steps must be written so AI Assistant can execute and validate them without guessing.
 
 - Use explicit, runnable commands, URLs, and API calls
 - Include an expected result for every step (output text, status code, or visible UI state)
 - Avoid vague language such as "check it works" or "verify manually"
 - State pass/fail criteria clearly so steps cannot be skipped or missed during `/speckit.implement`
 
-During implementation, GitHub Copilot **MUST** execute every Show & Tell step and confirm the expected result before marking the phase or user story complete.
+During implementation, AI Assistant **MUST** execute every Show & Tell step and confirm the expected result before marking the phase or user story complete.
 
 ## Plan Completion Checklist (Mandatory)
 
@@ -49,7 +49,7 @@ Before marking `plan.md` as complete, verify:
 - [ ] Plan addresses all requirements from `spec.md`
 - [ ] All architectural decisions have corresponding ADRs
 - [ ] Toolchain versions are specified, verified online during planning, and confirmed as the latest stable releases
-- [ ] Repository-template capabilities are planned using the skill at [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md), including at minimum:
+- [ ] Repository-template capabilities are planned using the skill at [.claude/skills/repository-template/SKILL.md](/.claude/skills/repository-template/SKILL.md), including at minimum:
   - [ ] Core Make System
   - [ ] Pre-commit Hooks
   - [ ] Secret Scanning
@@ -59,7 +59,7 @@ Before marking `plan.md` as complete, verify:
   - [ ] Tool Version Management
 - [ ] Each phase and user story includes a `Show & Tell` subsection
 - [ ] Show & Tell subsections are placed at the end of each phase or user story
-- [ ] Show & Tell steps are specific enough for GitHub Copilot to execute and validate without ambiguity
+- [ ] Show & Tell steps are specific enough for AI Assistant to execute and validate without ambiguity
 - [ ] Show & Tell steps define explicit expected outcomes and pass/fail criteria
 
 ## User Input
@@ -69,6 +69,45 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+## Pre-Execution Checks
+
+**Check for extension hooks (before planning)**:
+
+- Check if `.specify/extensions.yml` exists in the project root.
+- If it exists, read it and look for entries under the `hooks.before_plan` key
+- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
+- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
+- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
+  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
+  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
+- For each executable hook, output the following based on its `optional` flag:
+  - **Optional hook** (`optional: true`):
+
+    ```
+    ## Extension Hooks
+
+    **Optional Pre-Hook**: {extension}
+    Command: `/{command}`
+    Description: {description}
+
+    Prompt: {prompt}
+    To execute: `/{command}`
+    ```
+
+  - **Mandatory hook** (`optional: false`):
+
+    ```
+    ## Extension Hooks
+
+    **Automatic Pre-Hook**: {extension}
+    Executing: `/{command}`
+    EXECUTE_COMMAND: {command}
+
+    Wait for the result of the hook command before proceeding to the Outline.
+    ```
+
+- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
 
 ## Outline
 
@@ -86,6 +125,39 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Re-evaluate Constitution Check post-design
 
 4. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
+
+5. **Check for extension hooks**: After reporting, check if `.specify/extensions.yml` exists in the project root.
+   - If it exists, read it and look for entries under the `hooks.after_plan` key
+   - If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
+   - Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
+   - For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
+     - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
+     - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
+   - For each executable hook, output the following based on its `optional` flag:
+     - **Optional hook** (`optional: true`):
+
+       ```
+       ## Extension Hooks
+
+       **Optional Hook**: {extension}
+       Command: `/{command}`
+       Description: {description}
+
+       Prompt: {prompt}
+       To execute: `/{command}`
+       ```
+
+     - **Mandatory hook** (`optional: false`):
+
+       ```
+       ## Extension Hooks
+
+       **Automatic Hook**: {extension}
+       Executing: `/{command}`
+       EXECUTE_COMMAND: {command}
+       ```
+
+   - If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
 
 ## Phases
 
@@ -134,7 +206,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Add only new technology from current plan
    - Preserve manual additions between markers
 
-**Output**: data-model.md, /contracts/*, quickstart.md, agent-specific file
+**Output**: data-model.md, /contracts/\*, quickstart.md, agent-specific file
 
 ## Key rules
 
@@ -143,5 +215,5 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ---
 
-> **Version**: 1.6.0
+> **Version**: 1.6.1
 > **Last Amended**: 2026-03-01

@@ -27,9 +27,9 @@ Each phase and user story in `tasks.md` must include a `Show & Tell` subsection.
 
 These steps will be executed during implementation to verify each phase is complete.
 
-### GitHub Copilot Execution Requirement (Mandatory)
+### AI Assistant Execution Requirement (Mandatory)
 
-GitHub Copilot **MUST** execute every Show & Tell step during `/speckit.implement` and validate that the expected result is achieved.
+AI Assistant **MUST** execute every Show & Tell step during `/speckit.implement` and validate that the expected result is achieved.
 
 - Do not allow placeholder or ambiguous steps
 - Every step must include explicit pass/fail criteria
@@ -64,11 +64,11 @@ Before marking `tasks.md` as complete, verify:
 - [ ] Test tasks are listed before their corresponding implementation tasks
 - [ ] Each phase and user story ends with a task that runs `make lint` and `make test`
 - [ ] Each phase and user story includes a `Show & Tell` subsection with executable steps
-- [ ] GitHub Copilot executes every Show & Tell step during implementation
+- [ ] AI Assistant executes every Show & Tell step during implementation
 - [ ] Every Show & Tell step has explicit expected output/state and clear pass/fail criteria
 - [ ] No phase or user story is marked complete if any Show & Tell step has not passed
 
 ---
 
-> **Version**: 1.6.0
+> **Version**: 1.6.1
 > **Last Amended**: 2026-03-01

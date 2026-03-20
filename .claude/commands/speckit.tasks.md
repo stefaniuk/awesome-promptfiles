@@ -1,6 +1,6 @@
 ---
 description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
-handoffs: 
+handoffs:
   - label: Analyze For Consistency
     agent: speckit.analyze
     prompt: Run a project analysis for consistency
@@ -19,7 +19,7 @@ You **MUST** adhere to the following mandatory requirements when generating deve
 - **Output:** `tasks.md` (actionable task list)
 - **Next phase:** Implementation (`/speckit.implement`)
 
-**Base requirements:** Follow all rules in [copilot-instructions.md](/.github/copilot-instructions.md), particularly:
+**Base requirements:** Follow all rules in [CLAUDE.md](/.claude/CLAUDE.md), particularly:
 
 - Repository Tooling
 - Test-Driven Development
@@ -36,9 +36,9 @@ Each phase and user story in `tasks.md` must include a `Show & Tell` subsection.
 
 These steps will be executed during implementation to verify each phase is complete.
 
-### GitHub Copilot Execution Requirement (Mandatory)
+### AI Assistant Execution Requirement (Mandatory)
 
-GitHub Copilot **MUST** execute every Show & Tell step during `/speckit.implement` and validate that the expected result is achieved.
+AI Assistant **MUST** execute every Show & Tell step during `/speckit.implement` and validate that the expected result is achieved.
 
 - Do not allow placeholder or ambiguous steps
 - Every step must include explicit pass/fail criteria
@@ -68,12 +68,12 @@ make run
 Before marking `tasks.md` as complete, verify:
 
 - [ ] All phases and user stories from `plan.md` are covered
-- [ ] There is a task for each repository-template capability that was planned to be implemented using the skill at [.github/skills/repository-template/SKILL.md](/.github/skills/repository-template/SKILL.md)
+- [ ] There is a task for each repository-template capability that was planned to be implemented using the skill at [.claude/skills/repository-template/SKILL.md](/.claude/skills/repository-template/SKILL.md)
 - [ ] TDD sequencing is applied: Red (write failing test), Green (implement to pass), Refactor
 - [ ] Test tasks are listed before their corresponding implementation tasks
 - [ ] Each phase and user story ends with a task that runs `make lint` and `make test`
 - [ ] Each phase and user story includes a `Show & Tell` subsection with executable steps
-- [ ] GitHub Copilot executes every Show & Tell step during implementation
+- [ ] AI Assistant executes every Show & Tell step during implementation
 - [ ] Every Show & Tell step has explicit expected output/state and clear pass/fail criteria
 - [ ] No phase or user story is marked complete if any Show & Tell step has not passed
 
@@ -84,6 +84,45 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+## Pre-Execution Checks
+
+**Check for extension hooks (before tasks generation)**:
+
+- Check if `.specify/extensions.yml` exists in the project root.
+- If it exists, read it and look for entries under the `hooks.before_tasks` key
+- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
+- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
+- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
+  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
+  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
+- For each executable hook, output the following based on its `optional` flag:
+  - **Optional hook** (`optional: true`):
+
+    ```
+    ## Extension Hooks
+
+    **Optional Pre-Hook**: {extension}
+    Command: `/{command}`
+    Description: {description}
+
+    Prompt: {prompt}
+    To execute: `/{command}`
+    ```
+
+  - **Mandatory hook** (`optional: false`):
+
+    ```
+    ## Extension Hooks
+
+    **Automatic Pre-Hook**: {extension}
+    Executing: `/{command}`
+    EXECUTE_COMMAND: {command}
+
+    Wait for the result of the hook command before proceeding to the Outline.
+    ```
+
+- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
 
 ## Outline
 
@@ -126,6 +165,39 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
+6. **Check for extension hooks**: After tasks.md is generated, check if `.specify/extensions.yml` exists in the project root.
+   - If it exists, read it and look for entries under the `hooks.after_tasks` key
+   - If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
+   - Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
+   - For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
+     - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
+     - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
+   - For each executable hook, output the following based on its `optional` flag:
+     - **Optional hook** (`optional: true`):
+
+       ```
+       ## Extension Hooks
+
+       **Optional Hook**: {extension}
+       Command: `/{command}`
+       Description: {description}
+
+       Prompt: {prompt}
+       To execute: `/{command}`
+       ```
+
+     - **Mandatory hook** (`optional: false`):
+
+       ```
+       ## Extension Hooks
+
+       **Automatic Hook**: {extension}
+       Executing: `/{command}`
+       EXECUTE_COMMAND: {command}
+       ```
+
+   - If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+
 Context for task generation: $ARGUMENTS
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
@@ -152,7 +224,7 @@ Every task MUST strictly follow this format:
 4. **[Story] label**: REQUIRED for user story phase tasks only
    - Format: [US1], [US2], [US3], etc. (maps to user stories from spec.md)
    - Setup phase: NO story label
-   - Foundational phase: NO story label  
+   - Foundational phase: NO story label
    - User Story phases: MUST have story label
    - Polish phase: NO story label
 5. **Description**: Clear action with exact file path
@@ -204,5 +276,5 @@ Every task MUST strictly follow this format:
 
 ---
 
-> **Version**: 1.6.0
+> **Version**: 1.6.1
 > **Last Amended**: 2026-03-01
