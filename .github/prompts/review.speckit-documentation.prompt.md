@@ -207,10 +207,10 @@ Explicitly verify alignment between:
 
 - Ensure ADRs (decision records) exist for all material decisions and are stored under `./docs/adr/` (mandatory).
 - Validate each ADR against the ADR template in `./docs/adr/ADR-nnn_Any_Decision_Record_Template.md` (structure, required fields, and status semantics).
-- Ensure C4 model diagrams are present and correctly reflect the current architecture (mandatory).
-- Ensure data flow diagrams are present when the specification, plan, or ADRs describe material data movement or external integrations; otherwise record the omission explicitly.
+- Ensure C4 model diagrams are present in [LikeC4](https://likec4.dev/) format and correctly reflect the current architecture (mandatory).
+- Ensure data flow diagrams are present in Mermaid format when the specification, plan, or ADRs describe material data movement or external integrations; otherwise record the omission explicitly.
 
-These documentation artefacts are required for a complete documentation set for this repository and should be located in the `/docs/` directory. ADRs and C4 diagrams are mandatory. If any mandatory artefact is missing, flag this explicitly. If data flow diagrams are omitted, state the justification and the source reference that allows the omission.
+These documentation artefacts are required for a complete documentation set for this repository and should be located in the `/docs/` directory. ADRs and LikeC4 C4 diagrams are mandatory. If any mandatory artefact is missing, flag this explicitly. If data flow diagrams are omitted, state the justification and the source reference that allows the omission.
 
 ---
 

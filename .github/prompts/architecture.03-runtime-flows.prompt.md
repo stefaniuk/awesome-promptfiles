@@ -99,7 +99,7 @@ Write a short narrative that includes:
 
 #### 2C. Sequence diagram (Mermaid, component-level)
 
-- Use a Mermaid sequence diagram showing collaborating components and external services.
+- Use a Mermaid sequence diagram, authored in a fenced `mermaid` block, showing collaborating components and external services.
 - Keep participants at the **component** level (not individual functions), unless the repo is very small.
 - Show:
   - The trigger
@@ -114,7 +114,7 @@ Capture a brief, evidence-based view of how data moves through the flow.
 
 ##### Data flow diagram (Mermaid flowchart)
 
-- Use a Mermaid `flowchart LR` (left-to-right) diagram showing data movement.
+- Use a Mermaid `flowchart LR` (left-to-right) diagram, authored in a fenced `mermaid` block, showing data movement.
 - Show:
   - Input data sources (files, requests, messages)
   - Processing/transformation steps

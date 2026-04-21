@@ -35,7 +35,7 @@ Use this shared baseline for producing and maintaining architecture overview doc
 - [CBO-WRT-001] Use headings and short paragraphs.
 - [CBO-WRT-002] Prefer bullet lists over long prose.
 - [CBO-WRT-003] Keep statements specific (names, routes, topics, schedules, config keys).
-- [CBO-WRT-004] Use Mermaid diagrams where they clarify interactions.
+- [CBO-WRT-004] Use Mermaid diagrams, authored as fenced `mermaid` blocks, for non-C4 diagrams where they clarify interactions.
 - [CBO-WRT-005] Include a **Last Amended** footer in every file you produce, using this format:
 
 ```plaintext

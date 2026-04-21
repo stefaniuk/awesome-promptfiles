@@ -697,7 +697,7 @@ Documentation is part of "done". Any infrastructure change must leave the docume
 
 ### 17.1 C4 model alignment (mandatory)
 
-- [TF-DOC-001] Maintain a set of C4 diagrams in `docs/` (Context, Container, Component, and where valuable Deployment).
+- [TF-DOC-001] Maintain a set of C4 diagrams in `docs/` using the [LikeC4](https://likec4.dev/) format (Context, Container, Component, and where valuable Deployment).
 - [TF-DOC-002] When Terraform changes affect architecture boundaries, trust boundaries, runtime topology, or integrations, update the relevant C4 diagrams in the same PR.
 
 ### 17.2 Infrastructure diagram (mandatory)
@@ -720,8 +720,8 @@ Rules:
 
 ### 17.3 Diagram format and storage
 
-- [TF-DOC-005] Prefer diagrams-as-code where practical (for example Mermaid), stored in-repo and reviewable in PRs.
-- [TF-DOC-006] If using a binary diagram (for example diagrams.net), store the source file in `docs/diagrams/` and ensure it is version-controlled.
+- [TF-DOC-005] C4 diagrams must be stored in-repo as LikeC4 source files (`.c4` or `.likec4`) and remain reviewable in PRs.
+- [TF-DOC-006] Unless a more specific repository prompt explicitly requires a different format, any non-C4 diagram must be authored in Mermaid, either as fenced `mermaid` blocks in Markdown or as standalone Mermaid source files stored in-repo.
 - [TF-DOC-007] Link diagrams from a stable index page (for example `docs/architecture/README.md`) so they are discoverable.
 
 ### 17.4 Traceability to Terraform

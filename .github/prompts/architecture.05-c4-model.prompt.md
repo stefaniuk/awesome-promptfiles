@@ -1,17 +1,17 @@
 ---
 agent: agent
-description: Produce C4 model diagrams (Context, Container, Component) in Structurizr DSL (evidence-first, consistent naming)
+description: Produce C4 model diagrams (Context, Container, Component) in LikeC4 format (https://likec4.dev/, evidence-first, consistent naming)
 ---
 
 **Mandatory preparation:** read [architecture overview](../instructions/includes/architecture-baseline.include.md) instructions in full and follow strictly its rules before executing any step below.
 
 ## Goal 🎯
 
-Create (or update) Structurizr DSL files under `docs/architecture/`:
+Create (or update) LikeC4 source files under `docs/architecture/`:
 
-- `docs/architecture/c4-01-context.dsl`
-- `docs/architecture/c4-02-container.dsl`
-- `docs/architecture/c4-03-component-*.dsl` (one per container/context as needed)
+- `docs/architecture/c4-01-context.c4`
+- `docs/architecture/c4-02-container.c4`
+- `docs/architecture/c4-03-component-*.c4` (one per container/context as needed)
 
 Also ensure they are linked from: [architecture overview](../../docs/architecture/README.md) output
 
@@ -69,29 +69,29 @@ Record any gaps as **Unknown from code – {suggested action}** and avoid guessi
 
 ---
 
-### 2) Create Context diagram (Structurizr DSL)
+### 2) Create Context diagram (LikeC4)
 
-Create/update: `docs/architecture/c4-01-context.dsl`
+Create/update: `docs/architecture/c4-01-context.c4`
 
 Include:
 
-- One **softwareSystem** representing the codebase/system
-- Key **people** (user types) if evidenced by API/UI usage
-- Key **external software systems** the system integrates with
+- One LikeC4 top-level **system** representing the codebase/system
+- Key LikeC4 **actor** elements (user types) if evidenced by API/UI usage
+- Key **external systems** the system integrates with
 - High-level relationships (who uses what)
 
 Rules:
 
 - Only include externals that have evidence in code/config/IaC.
-- Use tags for: `Person`, `ExternalSystem`, `Database`, `Queue`, `Cache`, `Storage` as applicable.
+- Use LikeC4 element kinds and styles consistently so the model remains readable and reviewable.
 - Add brief descriptions (one sentence max).
 - Where meaningful and evidenced, annotate relationships with the interaction style (e.g. `HTTPS/443`, `Publishes events`, `Reads/writes`).
 
 ---
 
-### 3) Create Container diagram (Structurizr DSL)
+### 3) Create Container diagram (LikeC4)
 
-Create/update: `docs/architecture/c4-02-container.dsl`
+Create/update: `docs/architecture/c4-02-container.c4`
 
 Include containers for each deployable unit:
 
@@ -116,7 +116,7 @@ Rules:
 
 ---
 
-### 4) Create Component diagrams (Structurizr DSL)
+### 4) Create Component diagrams (LikeC4)
 
 Create component diagrams for containers where it adds value:
 
@@ -124,7 +124,7 @@ Create component diagrams for containers where it adds value:
 
 For each chosen container, create/update:
 
-- `docs/architecture/c4-03-component-{container-name}.dsl`
+- `docs/architecture/c4-03-component-{container-name}.c4`
 
 Include:
 
@@ -146,9 +146,9 @@ Rules:
 
 ### 5) Add evidence references and unknowns
 
-Structurizr DSL is not ideal for line-level evidence. Do this instead:
+LikeC4 source files are not ideal for line-level evidence. Do this instead:
 
-1. At the top of each `.dsl` file, include a short comment block:
+1. At the top of each `.c4` file, include a short comment block:
    - What inputs were used (links to repo map/components/flows)
    - A short "Evidence pointers" list (file paths only)
    - "Unknown from code" items, if any
@@ -169,15 +169,15 @@ Example comment:
 
 ### 6) Update the index (README)
 
-Update: [architecture overview](../../docs/architecture/README.md) with a **C4 Diagrams (Structurizr DSL)** section linking to:
+Update: [architecture overview](../../docs/architecture/README.md) with a **C4 Diagrams (LikeC4)** section linking to:
 
-- `c4-01-context.dsl`
-- `c4-02-container.dsl`
-- `c4-03-component-*.dsl`
+- `c4-01-context.c4`
+- `c4-02-container.c4`
+- `c4-03-component-*.c4`
 
 Also include brief "How to view" notes (repo-local, no external claims), for example:
 
-- "Open the DSL in your Structurizr tooling / exporter used by this repo (if present)."
+- "Open the `.c4` source in LikeC4-compatible tooling used by this repo (if present)."
 - If no tooling is found, record **Unknown from code – identify how diagrams are rendered in this repo**.
 
 ---
@@ -185,101 +185,135 @@ Also include brief "How to view" notes (repo-local, no external claims), for exa
 ## Output requirements
 
 - Keep diagrams readable and consistent.
+- Use the [LikeC4](https://likec4.dev/) format for every C4 diagram.
 - Use the evidence-first approach; do not invent externals, containers, or components.
 - When unsure, record **Unknown from code – {suggested action}** rather than guessing.
 
 ---
 
-## Structurizr DSL skeletons (use as starting points)
+## LikeC4 skeletons (use as starting points)
 
 ### Context skeleton
 
-```dsl
-workspace "System - C4" "C4 diagrams for the system." {
-  model {
-    user = person "User" "Primary user type." {
-      tags "Person"
-    }
+```c4
+specification {
+  element actor
+  element system
+  element external
+}
 
-    system = softwareSystem "System" "Short description." {
-      tags "SoftwareSystem"
-    }
-
-    external = softwareSystem "External System" "Short description." {
-      tags "ExternalSystem"
-    }
-
-    user -> system "Uses"
-    system -> external "Integrates with"
+model {
+  user = actor 'User' {
+    description 'Primary user type.'
   }
 
-  views {
-    systemContext system "01-SystemContext" "System Context" {
-      include *
-      autolayout lr
-    }
+  platform = system 'System' {
+    description 'Short description.'
+  }
 
-    styles {
-      element "Person" { shape person }
-      element "ExternalSystem" { background #999999; color #ffffff }
-    }
+  dependency = external 'External System' {
+    description 'Short description.'
+  }
+
+  user -> platform 'Uses'
+  platform -> dependency 'Integrates with'
+}
+
+views {
+  view index {
+    title 'System Context'
+    include *
   }
 }
 ```
 
 ### Container skeleton
 
-```dsl
-workspace "System - Containers" "Container diagram." {
-  model {
-    user = person "User" "Primary user type." { tags "Person" }
+```c4
+specification {
+  element actor
+  element system
+  element container
+  element datastore
+}
 
-    system = softwareSystem "System" "Short description." {
-      tags "SoftwareSystem"
+model {
+  user = actor 'User'
 
-      api = container "API Service" "Serves HTTP API." "Tech (if known)"
-      worker = container "Worker" "Processes background work." "Tech (if known)"
-      db = container "Database" "Stores data." "DB tech (if known)" { tags "Database" }
+  platform = system 'System' {
+    api = container 'API Service' {
+      description 'Serves the HTTP API.'
     }
 
-    user -> api "Uses"
-    api -> db "Reads/writes"
-    api -> worker "Publishes jobs/events"
+    worker = container 'Worker' {
+      description 'Processes background work.'
+    }
+
+    db = datastore 'Database' {
+      description 'Stores data.'
+    }
+
+    api -> db 'Reads and writes'
+    api -> worker 'Publishes jobs or events'
   }
 
-  views {
-    container system "02-Container" "Containers" {
-      include *
-      autolayout lr
-    }
+  user -> platform.api 'Uses'
+}
+
+views {
+  view index {
+    title 'System Context'
+    include user platform
+  }
+
+  view of platform {
+    title 'Container View'
+    include *
   }
 }
 ```
 
 ### Component skeleton
 
-```dsl
-workspace "System - Components" "Component diagram for one container." {
-  model {
-    system = softwareSystem "System" "Short description." {
-      api = container "API Service" "Serves HTTP API." "Tech (if known)" {
-        controller = component "Controller" "Handles HTTP requests." "Tech (if known)"
-        service = component "Application Service" "Orchestrates use-cases." "Tech (if known)"
-        repo = component "Repository" "Persists data." "Tech (if known)"
+```c4
+specification {
+  element system
+  element container
+  element component
+  element datastore
+}
+
+model {
+  platform = system 'System' {
+    api = container 'API Service' {
+      controller = component 'Controller' {
+        description 'Handles HTTP requests.'
       }
-      db = container "Database" "Stores data." "DB tech (if known)" { tags "Database" }
+
+      service = component 'Application Service' {
+        description 'Orchestrates use cases.'
+      }
+
+      repo = component 'Repository' {
+        description 'Persists data.'
+      }
+
+      controller -> service 'Calls'
+      service -> repo 'Uses'
     }
 
-    controller -> service "Calls"
-    service -> repo "Uses"
-    repo -> db "Reads/writes"
+    db = datastore 'Database' {
+      description 'Stores data.'
+    }
   }
 
-  views {
-    component api "03-Component-API" "Components - API Service" {
-      include *
-      autolayout lr
-    }
+  platform.api.repo -> platform.db 'Reads and writes'
+}
+
+views {
+  view of platform.api {
+    title 'Component View - API Service'
+    include *
   }
 }
 ```

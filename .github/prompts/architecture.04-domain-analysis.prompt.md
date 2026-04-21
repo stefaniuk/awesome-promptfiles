@@ -109,7 +109,7 @@ Create/update: `docs/architecture/domain-03-context-map.md`
    - Integration style (HTTP API, async events, shared DB, shared library, file/object storage)
    - Any translation layer (Anti-Corruption Layer, mapping code), if evidenced
    - Any versioning contract (API version headers, event schema versions) if evidenced
-2. Include a Mermaid diagram (flowchart) showing contexts and arrows.
+2. Include a Mermaid diagram, authored as a fenced `mermaid` flowchart block, showing contexts and arrows.
 3. Highlight risky couplings (only if evidenced), such as:
    - Direct database access across contexts
    - Shared mutable tables/schemas
