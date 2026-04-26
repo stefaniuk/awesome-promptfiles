@@ -26,6 +26,7 @@ lint: # Run linter to check code style and errors @Quality
 
 test: # Run all tests @Testing
 	bash ./scripts/tests/apply.test.sh && echo "apply: ok"
+	bash ./scripts/tests/import.test.sh && echo "import: ok"
 
 clone-rt: # Clone the repository template into .github/skills/repository-template @Operations
 	.github/skills/repository-template/scripts/git-clone-repository-template.sh
@@ -37,6 +38,11 @@ apply: # Copy prompt files assets to a destination repository; mandatory: dest=[
 	$(if $(dest),,$(error dest is required. Usage: make apply dest=/path/to/destination ai=copilot|claude))
 	$(if $(ai),,$(error ai is required. Usage: make apply dest=/path/to/destination ai=copilot|claude))
 	./scripts/apply.sh "$(dest)" "$(ai)"
+
+import: # Import changed prompt files from a destination repository; mandatory: dest=[path] ai=[copilot|claude]; optional: force|new=[true] @Operations
+	$(if $(dest),,$(error dest is required. Usage: make import dest=/path/to/destination ai=copilot|claude))
+	$(if $(ai),,$(error ai is required. Usage: make import dest=/path/to/destination ai=copilot|claude))
+	./scripts/import.sh "$(dest)" "$(ai)"
 
 count-tokens: # Count LLM tokens for key instruction packs; optional: args=[files/options] @Operations
 	uv run --with tiktoken python scripts/count-tokens.py \
@@ -74,6 +80,7 @@ ${VERBOSE}.SILENT: \
 	config \
 	count-tokens \
 	format \
+	import \
 	lint \
 	lint-file-format \
 	lint-markdown-format \
