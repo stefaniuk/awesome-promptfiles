@@ -201,6 +201,34 @@ The report shows:
 
 </details>
 
+#### Commit at each lifecycle stage
+
+Each spec-kit stage produces artefacts worth committing. The table below maps every commit point in the flow diagram to a conventional commit message.
+
+| Stage | Trigger                                                                                  | Conventional commit                                    |
+| :---: | :--------------------------------------------------------------------------------------- | :----------------------------------------------------- |
+|   1   | Constitution created or updated (`/speckit.constitution`)                                | `docs(constitution): establish project constitution`   |
+|   2   | Specification drafted (`/speckit.specify`)                                               | `docs(spec): draft feature specification`              |
+|   3   | Specification refined after clarification loop (`/speckit.clarify` → `/speckit.specify`) | `docs(spec): refine specification after clarification` |
+|   4   | Implementation plan created (`/speckit.plan`)                                            | `docs(plan): draft implementation plan`                |
+|   5   | Plan revised after checklist gap-fill (`/speckit.checklist` → `/speckit.plan`)           | `docs(plan): revise plan with checklist coverage`      |
+|   6   | Tasks generated (`/speckit.tasks`)                                                       | `docs(tasks): generate implementation tasks`           |
+|   7   | Tasks revised after consistency analysis (`/speckit.analyze` → `/speckit.tasks`)         | `docs(tasks): align tasks after consistency analysis`  |
+|   8   | Documentation review passed (`/review.speckit-documentation`)                            | `docs(review): pass documentation review gate`         |
+|   9   | Implementation completed (`/speckit.implement`, per phase)                               | `feat(feature): implement phase N`                     |
+|  10   | Code review passed (`/review.speckit-code`)                                              | `refactor(review): address code review findings`       |
+|  11   | Test review passed (`/review.speckit-test`)                                              | `test(review): address test review findings`           |
+
+<details>
+<summary><strong>Commit conventions explained</strong></summary>
+
+- **Loops produce incremental commits.** Each pass through a clarify, checklist, or analyse loop can warrant its own commit when it changes artefacts materially. The table shows the "exit" commit — the one that locks in the stable artefact.
+- **Multi-phase implementation.** Replace `phase N` with a descriptive label and `feature` with the feature name, e.g. `feat(checkout): implement phase 1 — data model`, `feat(checkout): implement phase 2 — API layer`.
+- **Clean review gates.** If a review gate passes without triggering changes, fold it into the preceding commit. If it triggers fixes, use `refactor(review):` for code or `test(review):` for tests.
+- **Scoping convention.** Every commit carries a scope: governance artefacts use `constitution`, `spec`, `plan`, `tasks`, or `review`; implementation commits use the feature name as the scope.
+
+</details>
+
 ### Examples
 
 #### Featured artefacts
