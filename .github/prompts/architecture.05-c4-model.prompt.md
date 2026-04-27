@@ -3,7 +3,7 @@ agent: agent
 description: Produce C4 model diagrams (Context, Container, Component) in LikeC4 format (https://likec4.dev/, evidence-first, consistent naming)
 ---
 
-**Mandatory preparation:** read [architecture overview](../instructions/includes/architecture-baseline.include.md) instructions in full and follow strictly its rules before executing any step below.
+**Mandatory preparation:** read [architecture overview](../instructions/includes/architecture-baseline.include.md) and [LikeC4 DSL](../instructions/likec4.instructions.md) instructions in full and follow strictly their rules before executing any step below.
 
 ## Goal 🎯
 
@@ -191,6 +191,33 @@ Also include brief "How to view" notes (repo-local, no external claims), for exa
 
 ---
 
+## LikeC4 pitfalls and validation ⚠️
+
+These rules are derived from real debugging sessions. Follow them to avoid silent failures.
+
+### Element declaration syntax
+
+LikeC4 supports two declaration forms — **never mix them**:
+
+| Form                         | Syntax                              | Valid? |
+| ---------------------------- | ----------------------------------- | ------ |
+| Identifier-first (preferred) | `identifier = kind 'Title' { ... }` | ✅     |
+| Kind-first (alternative)     | `kind identifier 'Title' { ... }`   | ✅     |
+| **Mixed (common mistake)**   | `kind identifier = 'Title' { ... }` | ❌     |
+
+The mixed form silently drops the element — no error, no warning. The diagram renders with missing nodes.
+
+### Post-generation validation (mandatory)
+
+After creating or editing any `.likec4` file:
+
+1. Call `mcp_likec4_read-project-summary` and count the elements returned.
+2. Compare against the expected count from your model.
+3. If elements are missing, search for the invalid `kind identifier = 'Title'` pattern.
+4. Call `mcp_likec4_read-view` for each view to confirm nodes and edges.
+
+---
+
 ## LikeC4 skeletons (use as starting points)
 
 ### Context skeleton
@@ -320,5 +347,5 @@ views {
 
 ---
 
-> **Version**: 1.1.3
-> **Last Amended**: 2026-01-17
+> **Version**: 1.2.0
+> **Last Amended**: 2026-04-27
