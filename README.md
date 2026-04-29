@@ -113,7 +113,7 @@ flowchart TD
   consistency -- No --> reviewDocs["/review.speckit-documentation"]
   reviewDocs -.- reviewDocsNote["💡 Example (run+1): Validate #file:deployment.md checklist, confirm each item is documented, apply sensible defaults where missing or request clarification"]
   reviewDocs --> implement["/speckit.implement"]
-  implement -.- implementNote["💡 Example (run N-times): Phase X"]
+  implement -.- implementNote["💡 Example (run N-times): Phase X, use subagents for each task to keep the main context window as small as possible"]
   implement --> reviewCode["/review.speckit-code"]
   reviewCode --> reviewTest["/review.speckit-test"]
 
